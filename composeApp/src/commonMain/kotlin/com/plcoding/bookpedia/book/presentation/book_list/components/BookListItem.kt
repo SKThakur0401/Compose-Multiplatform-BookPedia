@@ -102,10 +102,11 @@ fun BookListItem(
                     targetValue = if(painterState is AsyncImagePainter.State.Success) {
                         1f
                     } else {
-                        0f
-                    },
-                    animationSpec = tween(durationMillis = 800)
-                )
+                        0f      // It's the initial value of "transition" since "State" won't be "Success"
+                    },          // initially after "targetValue" is changed due to state = Success then
+                    // this targetValue will become "1" and it will take exactly 1200 ms to go from 0 to 1
+                    animationSpec = tween(durationMillis = 1200)    // This decides duration of animation,
+                )                                           // How long will animation take to complete
 
                 when (val result = imageLoadResult) {
                     null -> PulseAnimation(
@@ -128,7 +129,8 @@ fun BookListItem(
                                     matchHeightConstraintsFirst = true
                                 )
                                 .graphicsLayer {
-                                    rotationX = (1f - transition) * 30f
+                                    rotationY = (1f - transition) * 90f
+                                    rotationX = (1f - transition) * 90f
                                     val scale = 0.8f + (0.2f * transition)
                                     scaleX = scale
                                     scaleY = scale

@@ -20,9 +20,24 @@ import org.koin.dsl.module
 expect val platformModule: Module
 
 val sharedModule = module {
+
     single { HttpClientFactory.create(get()) }
+    // In above code "get()" is a koin function which gets the dependency which'll be required
+    // Here the dependency required is basically "engine", "engine" will be different for all
+    // platforms, and it is written in platformModule of all the device types... (So koin knows
+    // how to provide engine depending on platform...
+
+    // Now for any object creation using koin we can inject dependencies using "get()" if there are
+    // 2 dependencies we can simply do "    single { myCoolClass(get(), get()) } to get both
+    // but there's a better way... instead of doing get() for every new dependency we can do is
+    // singleOf(::myCoolClass)      // This would automatically try to create instance of this
+    // class with all required dependencies
+
     singleOf(::KtorRemoteBookDataSource).bind<RemoteBookDataSource>()
     singleOf(::DefaultBookRepository).bind<BookRepository>()
+
+    // .bind<XYZ> allows us to bind interface to implementation, whenever u ask koin to generate
+    // object of BookRepository ... it will return DefaultBookRepository instance :)
 
     single {
         get<DatabaseFactory>().create()

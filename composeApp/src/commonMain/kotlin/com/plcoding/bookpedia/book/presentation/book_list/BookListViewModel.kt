@@ -41,10 +41,10 @@ class BookListViewModel(
             }
             observeFavoriteBooks()
         }
-        .stateIn(
+        .stateIn(       // "stateIn" helps in coverting "Flow<>" to "StateFlow<>" which we need here
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            _state.value
+            SharingStarted.WhileSubscribed(5000L),  //
+            _state.value        // It's the initial value
         )
 
     fun onAction(action: BookListAction) {
@@ -68,6 +68,12 @@ class BookListViewModel(
     }
 
     private fun observeFavoriteBooks() {
+        // We've put this fn in "onStart" of state-flow, and that will called multiple times..
+        // How? Ans-> When we open app then, and when we move from booklist to bookDetail screen..
+        // this observer will continue to observe.. and when we come back to booklist screen
+        // "onStart" will trigger again! This will cause multiple observers for same thing
+        // hence we're cancelling any existing coroutine before starting one
+
         observeFavoriteJob?.cancel()
         observeFavoriteJob = bookRepository
             .getFavoriteBooks()

@@ -55,6 +55,8 @@ fun App() {
                         selectedBookViewModel.onSelectBook(null)
                     }
 
+//                    Log.d("skt_0401", "nav to book-List")
+
                     BookListScreenRoot(
                         viewModel = viewModel,
                         onBookClick = { book ->
@@ -74,7 +76,10 @@ fun App() {
                     } }
                 ) {
                     val selectedBookViewModel =
-                        it.sharedKoinViewModel<SelectedBookViewModel>(navController)
+                        it.sharedKoinViewModel<SelectedBookViewModel>(navController)    // This is
+                                    // the Koin way of doing what Hilt does with navGraphViewModels()
+                                    // this is shared only within this "navGraph" --->> (BookGraph)
+
                     val viewModel = koinViewModel<BookDetailViewModel>()
                     val selectedBook by selectedBookViewModel.selectedBook.collectAsStateWithLifecycle()
 
@@ -83,7 +88,7 @@ fun App() {
                             viewModel.onAction(BookDetailAction.OnSelectedBookChange(it))
                         }
                     }
-
+//                    Log.d("skt_0401", "nav to bookDetail")
                     BookDetailScreenRoot(
                         viewModel = viewModel,
                         onBackClick = {
@@ -102,10 +107,13 @@ private inline fun <reified T: ViewModel> NavBackStackEntry.sharedKoinViewModel(
     navController: NavController
 ): T {
     val navGraphRoute = destination.parent?.route ?: return koinViewModel<T>()
+    // destination.parent ---> Implies the NavGraph
+
     val parentEntry = remember(this) {
         navController.getBackStackEntry(navGraphRoute)
     }
-    return koinViewModel(
-        viewModelStoreOwner = parentEntry
-    )
-}
+    return koinViewModel(                       // We're basically creating a koinViewModel only
+        viewModelStoreOwner = parentEntry       // just changing the "viewModelStoreOwner" to "parentEntry"
+    )                               // & to obtain "parentEntry" all this code was required
+}                       // All this "NavBackStackEntry" & "navController" is just required to generate
+                        // this "parentEntry" object :)
