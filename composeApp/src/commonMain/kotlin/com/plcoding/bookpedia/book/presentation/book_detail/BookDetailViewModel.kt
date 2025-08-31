@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.plcoding.bookpedia.app.Route
 import com.plcoding.bookpedia.book.domain.BookRepository
+import com.plcoding.bookpedia.core.domain.onError
 import com.plcoding.bookpedia.core.domain.onSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -28,6 +28,7 @@ class BookDetailViewModel(
     val state = _state
         .onStart {
             fetchBookDescription()
+            fetchBookDetails()
             observeFavoriteStatus()
         }
         .stateIn(
@@ -80,6 +81,32 @@ class BookDetailViewModel(
                         ),
                         isLoading = false
                     ) }
+                }
+        }
+    }
+
+    private fun fetchBookDetails() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoadingDetails = true, errorMessage = null) }
+
+            bookRepository
+                .getBookDetails(bookId)
+                .onSuccess { bookDetails ->
+                    _state.update {
+                        it.copy(
+                            bookDetails = bookDetails,
+                            book = bookDetails.book,
+                            isLoadingDetails = false
+                        )
+                    }
+                }
+                .onError { error ->
+                    _state.update {
+                        it.copy(
+                            isLoadingDetails = false,
+                            errorMessage = "Failed to load book details"
+                        )
+                    }
                 }
         }
     }

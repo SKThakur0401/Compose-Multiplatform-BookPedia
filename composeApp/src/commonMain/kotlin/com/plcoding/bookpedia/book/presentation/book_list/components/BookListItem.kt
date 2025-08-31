@@ -3,25 +3,27 @@ package com.plcoding.bookpedia.book.presentation.book_list.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+//import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,6 +54,7 @@ import com.plcoding.bookpedia.core.presentation.SandYellow
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.round
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BookListItem(
     book: Book,
@@ -67,15 +71,13 @@ fun BookListItem(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min),         // This makes row height equal to min required
-                        // row-height so that all the columns inside that row can fit properly
-
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Box(                        // We're using "Box" coz we'll show Loading animation/default img
-                modifier = Modifier     // or actual img, depending on the state... so we'll replace in this box
-                    .height(100.dp),
+            Box(
+                modifier = Modifier
+                    .height(120.dp), // Increased height to accommodate more content
                 contentAlignment = Alignment.Center
             ) {
                 var imageLoadResult by remember {
@@ -86,8 +88,8 @@ fun BookListItem(
                     onSuccess = {
                         imageLoadResult =
                             if (it.painter.intrinsicSize.width > 1 && it.painter.intrinsicSize.height > 1) {
-                                Result.success(it.painter)      // We're checking size of img to confirm if we
-                            } else {                            // received actual img or "0" size img/nothing
+                                Result.success(it.painter)
+                            } else {
                                 Result.failure(Exception("Invalid image size"))
                             }
                     },
@@ -102,11 +104,10 @@ fun BookListItem(
                     targetValue = if(painterState is AsyncImagePainter.State.Success) {
                         1f
                     } else {
-                        0f      // It's the initial value of "transition" since "State" won't be "Success"
-                    },          // initially after "targetValue" is changed due to state = Success then
-                    // this targetValue will become "1" and it will take exactly 1200 ms to go from 0 to 1
-                    animationSpec = tween(durationMillis = 1200)    // This decides duration of animation,
-                )                                           // How long will animation take to complete
+                        0f
+                    },
+                    animationSpec = tween(durationMillis = 1200)
+                )
 
                 when (val result = imageLoadResult) {
                     null -> PulseAnimation(
@@ -143,14 +144,29 @@ fun BookListItem(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f),
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Title
                 Text(
                     text = book.title,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Medium
                 )
+
+                // Subtitle
+                book.subtitle?.let { subtitle ->
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Gray
+                    )
+                }
+
+                // Author
                 book.authors.firstOrNull()?.let { authorName ->
                     Text(
                         text = authorName,
@@ -159,19 +175,100 @@ fun BookListItem(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                book.averageRating?.let { rating ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+
+                // Rating and additional info row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    book.averageRating?.let { rating ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${round(rating * 10) / 10.0}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = SandYellow,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+
+                    // Edition count
+                    if (book.numEditions > 1) {
                         Text(
-                            text = "${round(rating * 10) / 10.0}",
-                            style = MaterialTheme.typography.bodyMedium
+                            text = "${book.numEditions} editions",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
                         )
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = SandYellow
-                        )
+                    }
+                }
+
+                // Status badges and subjects
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    // Read Online badge
+                    if (book.hasFulltext) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color.Green.copy(alpha = 0.1f)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(12.dp),
+                                    tint = Color.Green
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Text(
+                                    text = "Read Online",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.Green
+                                )
+                            }
+                        }
+                    }
+
+                    // Availability status
+                    book.availabilityStatus?.let { status ->
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text = status.uppercase(),
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    // Top subjects (show max 2 on PLP)
+                    book.subjects.take(2).forEach { subject ->
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text = subject,
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.secondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
