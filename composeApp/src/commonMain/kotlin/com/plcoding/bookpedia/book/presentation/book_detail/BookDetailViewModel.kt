@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.plcoding.bookpedia.app.Route
 import com.plcoding.bookpedia.book.domain.BookRepository
+import com.plcoding.bookpedia.book.presentation.SelectedBookViewModel
 import com.plcoding.bookpedia.core.domain.onError
 import com.plcoding.bookpedia.core.domain.onSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ class BookDetailViewModel(
     private val bookId = savedStateHandle.toRoute<Route.BookDetail>().id
 
     private val _state = MutableStateFlow(BookDetailState())
+
     val state = _state
         .onStart {
             fetchBookDescription()
@@ -55,7 +57,21 @@ class BookDetailViewModel(
                     }
                 }
             }
-            else -> Unit
+
+            BookDetailAction.OnBackClick -> {
+                // Handled in the UI layer (e.g., via NavController)
+            }
+
+            is BookDetailAction.OnAddToCartClick -> {
+                _state.update { it.copy(isInCart = true) }
+            }
+            is BookDetailAction.OnRemoveFromCartClick -> {
+                _state.update { it.copy(isInCart = false) }
+            }
+
+            is BookDetailAction.OnCartStatusChange -> {
+                _state.update { it.copy(isInCart = action.isInCart) }
+            }
         }
     }
 
@@ -95,7 +111,7 @@ class BookDetailViewModel(
                     _state.update {
                         it.copy(
                             bookDetails = bookDetails,
-                            book = bookDetails.book,
+//                            book = bookDetails.book,
                             isLoadingDetails = false
                         )
                     }

@@ -61,12 +61,12 @@ class DefaultBookRepository(
                     val localBook = favoriteBookDao.getFavoriteBook(bookId)?.toBook()
                     val baseBook = localBook ?: Book(
                         id = bookId,
-                        title = workResult.data.title ?: "Unknown Title",
+                        title = /*workResult.data.title ?:*/ "Unknown Title",
                         imageUrl = "",
                         authors = emptyList(),
                         description = null,
                         languages = emptyList(),
-                        firstPublishYear = workResult.data.firstPublishDate,
+                        firstPublishYear = /*workResult.data.firstPublishDate ?:*/ null,
                         averageRating = null,
                         ratingCount = null,
                         numPages = null,

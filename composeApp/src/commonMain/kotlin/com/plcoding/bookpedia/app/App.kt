@@ -21,7 +21,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.plcoding.bookpedia.book.domain.Book
 import com.plcoding.bookpedia.book.presentation.SelectedBookViewModel
+import com.plcoding.bookpedia.book.presentation.add_to_cart.AddToCartScreen
+import com.plcoding.bookpedia.book.presentation.add_to_cart.AddToCartViewModel
+import com.plcoding.bookpedia.book.presentation.add_to_cart.components.CheckoutScreen
 import com.plcoding.bookpedia.book.presentation.book_detail.BookDetailAction
 import com.plcoding.bookpedia.book.presentation.book_detail.BookDetailScreenRoot
 import com.plcoding.bookpedia.book.presentation.book_detail.BookDetailViewModel
@@ -29,6 +33,7 @@ import com.plcoding.bookpedia.book.presentation.book_list.BookListScreenRoot
 import com.plcoding.bookpedia.book.presentation.book_list.BookListViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 
 @Composable
@@ -64,6 +69,9 @@ fun App() {
                             navController.navigate(
                                 Route.BookDetail(book.id)
                             )
+                        },
+                        onCartClick = {
+                            navController.navigate(Route.AddToCart)
                         }
                     )
                 }
@@ -88,12 +96,50 @@ fun App() {
                             viewModel.onAction(BookDetailAction.OnSelectedBookChange(it))
                         }
                     }
-//                    Log.d("skt_0401", "nav to bookDetail")
+
                     BookDetailScreenRoot(
                         viewModel = viewModel,
                         onBackClick = {
                             navController.navigateUp()
+                        },
+                        selectedBookViewModel = selectedBookViewModel
+                    )
+                }
+
+                composable<Route.AddToCart>(
+                    enterTransition = { slideInHorizontally { initialOffset ->
+                        initialOffset
+                    } },
+                    exitTransition = { slideOutHorizontally { initialOffset ->
+                        initialOffset
+                    } }
+                ) {
+                    val viewModel = koinViewModel<AddToCartViewModel>()
+                    val selectedBookViewModel =
+                        it.sharedKoinViewModel<SelectedBookViewModel>(navController)
+
+                    AddToCartScreen(
+                        viewModel = viewModel,
+                        selectedBookViewModel = selectedBookViewModel,
+                        onBackClick = {
+                            navController.navigateUp()
+                        },
+                        onCheckoutClicked = {
+                            navController.navigate(Route.CheckoutScreen)
                         }
+                    )
+                }
+
+                composable<Route.CheckoutScreen>(
+                    enterTransition = { slideInHorizontally { initialOffset ->
+                        initialOffset
+                    } },
+                    exitTransition = { slideOutHorizontally { initialOffset ->
+                        initialOffset
+                    } }
+                ) {
+                    CheckoutScreen(
+                        selectedBookViewModel = it.sharedKoinViewModel<SelectedBookViewModel>(navController)
                     )
                 }
             }

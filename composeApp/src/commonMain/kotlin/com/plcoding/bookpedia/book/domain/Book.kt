@@ -23,7 +23,17 @@ data class Book(
     val isLendable: Boolean = false,
     val excerpts: List<String> = emptyList(),
     val links: List<BookLink> = emptyList()
-)
+){
+    // function to generate book price using book id so that each time a particular book is called it returns the same price
+    fun generateBookPrice(): Double {
+        val price = id.hashCode().toLong() % 100 // Limit seed to a reasonable range
+        return if(price <= 0) {
+            (price + 100) / 10.0 // Ensure positive price
+        } else {
+            price.toDouble()
+        }
+    }
+}
 
 data class BookLink(
     val title: String,

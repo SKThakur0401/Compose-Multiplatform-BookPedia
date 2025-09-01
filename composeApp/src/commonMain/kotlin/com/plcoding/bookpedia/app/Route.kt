@@ -12,4 +12,10 @@ sealed interface Route {
 
     @Serializable
     data class BookDetail(val id: String): Route
+
+    @Serializable
+    data object AddToCart: Route
+
+    @Serializable
+    data object CheckoutScreen: Route
 }

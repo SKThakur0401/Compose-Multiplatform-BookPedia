@@ -13,4 +13,17 @@ class SelectedBookViewModel: ViewModel() {
     fun onSelectBook(book: Book?) {
         _selectedBook.value = book
     }
+
+    private val _cartItems = MutableStateFlow<List<Book>>(emptyList())
+    val cartItems = _cartItems.asStateFlow()
+
+    fun addBookToCart(book: Book) {
+        // Implementation for adding the book to the cart
+        _cartItems.value += book
+    }
+
+    fun removeBookFromCart(book: Book) {
+        // Implementation for removing the book from the cart
+        _cartItems.value = _cartItems.value.filter { it.id != book.id }
+    }
 }

@@ -9,5 +9,6 @@ data class BookDetailState(
     val book: Book? = null,
     val bookDetails: BookDetails? = null,
     val isLoadingDetails: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isInCart: Boolean = false
 )
