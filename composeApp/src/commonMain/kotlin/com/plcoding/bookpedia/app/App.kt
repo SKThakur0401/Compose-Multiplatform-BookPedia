@@ -35,7 +35,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-
+// App is the main entry point for the application
+// It is the top-level composable that contains the NavHost
+// The NavHost is responsible for managing the navigation between different screens
+// The NavHost is composed of multiple NavGraphs
+// Each NavGraph is responsible for managing the navigation between different screens within that graph
+// The NavGraphs are composed of multiple composables
+// Each composable is responsible for displaying a different screen
 @Composable
 @Preview
 fun App() {
