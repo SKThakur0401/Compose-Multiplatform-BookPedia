@@ -36,14 +36,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.AutoStories
-import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.material.icons.filled.BookmarkAdded
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.ShoppingCartCheckout
-import androidx.compose.material.icons.filled.Star
+import com.plcoding.bookpedia.core.presentation.components.BookPediaIcons
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -87,6 +80,8 @@ import com.plcoding.bookpedia.book.domain.BookRatings
 import com.plcoding.bookpedia.book.domain.BookShelves
 import com.plcoding.bookpedia.book.presentation.SelectedBookViewModel
 import com.plcoding.bookpedia.core.presentation.SandYellow
+import com.plcoding.bookpedia.core.presentation.components.*
+import com.plcoding.bookpedia.core.presentation.theme.*
 import kotlin.math.min
 import kotlin.math.round
 
@@ -335,12 +330,12 @@ private fun HeroSection(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Title with stunning typography - Remove alpha modifier
+            // Title with stunning typography
             Text(
                 text = book.title,
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 28.sp
+                style = BookPediaCustomTypography.BookTitle.copy(
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.ExtraBold
                 ),
                 textAlign = TextAlign.Center,
                 color = Color.White,
@@ -360,25 +355,25 @@ private fun HeroSection(
                 )
             }
 
-            // Author with accent color - Remove alpha modifier
+            // Author with accent color
             Text(
                 text = "by ${book.authors.joinToString()}",
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.Medium
+                style = BookPediaCustomTypography.AuthorName.copy(
+                    fontSize = 16.sp
                 ),
                 textAlign = TextAlign.Center,
-                color = accentColor,
+                color = BookPediaColors.SecondaryDark,
                 modifier = Modifier.padding(top = 12.dp)
             )
 
             // Price display
             Text(
                 text = "$${book.generateBookPrice()}",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold
+                style = BookPediaCustomTypography.PriceText.copy(
+                    fontSize = 24.sp
                 ),
                 textAlign = TextAlign.Center,
-                color = Color.White,
+                color = BookPediaColors.SecondaryDark,
                 modifier = Modifier.padding(top = 16.dp)
             )
 
@@ -458,7 +453,7 @@ private fun QuickInfoSection(book: com.plcoding.bookpedia.book.domain.Book) {
         if (book.hasFulltext) {
             item {
                 GlassmorphicChip(
-                    icon = Icons.Default.MenuBook,
+                    icon = BookPediaIcons.Star,
                     text = "Read Online",
                     color = Color(0xFF4CAF50)
                 )
@@ -477,7 +472,7 @@ private fun QuickInfoSection(book: com.plcoding.bookpedia.book.domain.Book) {
         book.averageRating?.let { rating ->
             item {
                 GlassmorphicChip(
-                    icon = Icons.Default.Star,
+                    icon = BookPediaIcons.Star,
                     text = "${round(rating * 10) / 10.0}",
                     color = SandYellow
                 )
@@ -590,7 +585,7 @@ private fun RatingsSectionStunning(ratings: BookRatings?) {
                             Row {
                                 repeat(5) { index ->
                                     Icon(
-                                        imageVector = Icons.Default.Star,
+                                        imageVector = BookPediaIcons.Star,
                                         contentDescription = null,
                                         modifier = Modifier.size(20.dp),
                                         tint = if (index < avg.toInt()) SandYellow else Color.Gray.copy(alpha = 0.3f)
@@ -667,7 +662,7 @@ private fun AnimatedRatingBar(
         )
 
         Icon(
-            imageVector = Icons.Default.Star,
+            imageVector = BookPediaIcons.Star,
             contentDescription = null,
             modifier = Modifier.size(12.dp),
             tint = SandYellow
@@ -736,21 +731,21 @@ private fun ShelfsSectionStunning(shelves: BookShelves?) {
                     StunningShelfItem(
                         label = "Want to Read",
                         count = shelf.wantToRead,
-                        icon = Icons.Default.BookmarkAdd,
+                        icon = BookPediaIcons.BookmarkBorder,
                         color = Color(0xFF2196F3)
                     )
 
                     StunningShelfItem(
                         label = "Reading",
                         count = shelf.currentlyReading,
-                        icon = Icons.Default.AutoStories,
+                        icon = BookPediaIcons.Star,
                         color = Color(0xFF4CAF50)
                     )
 
                     StunningShelfItem(
                         label = "Read",
                         count = shelf.alreadyRead,
-                        icon = Icons.Default.BookmarkAdded,
+                        icon = BookPediaIcons.Bookmark,
                         color = Color(0xFF9C27B0)
                     )
                 }
@@ -1100,7 +1095,7 @@ private fun FloatingFavoriteButton(
             modifier = Modifier.shadow(8.dp, CircleShape)
         ) {
             Icon(
-                imageVector = if (isFavorite) Icons.Default.BookmarkAdded else Icons.Default.BookmarkAdd,
+                imageVector = if (isFavorite) BookPediaIcons.Bookmark else BookPediaIcons.BookmarkBorder,
                 contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
                 tint = Color.White
             )
@@ -1133,7 +1128,7 @@ private fun StunningBackButton(
         color = Color.Transparent
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = BookPediaIcons.ArrowBack,
             contentDescription = "Back",
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.primary
@@ -1171,72 +1166,29 @@ private fun CartButton(
     onRemoveFromCart: (Book) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val buttonColor = if (isInCart) Color(0xFFE53E3E) else Color(0xFF38A169)
     val buttonText = if (isInCart) "Remove from Cart" else "Add to Cart"
-    val buttonIcon = if (isInCart) Icons.Default.ShoppingCartCheckout else Icons.Default.AddShoppingCart
-
-    val scale by animateFloatAsState(
-        targetValue = if (isInCart) 0.95f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
+    val buttonIcon = if (isInCart) BookPediaIcons.Remove else BookPediaIcons.ShoppingCart
 
     AnimatedVisibility(
         visible = true,
-        enter = slideInVertically() + fadeIn(),
-        exit = fadeOut()
+        enter = BookPediaAnimations.fadeInScale,
+        exit = BookPediaAnimations.fadeOutScale
     ) {
-        Surface(
-            modifier = modifier
-                .scale(scale)
-                .fillMaxWidth(0.8f)
-                .height(56.dp)
-                .clip(RoundedCornerShape(28.dp))
-                .clickable {
-                    if (isInCart) {
-                        onRemoveFromCart(book)
-                    } else {
-                        onAddToCart(book)
-                    }
+        PremiumButton(
+            text = buttonText,
+            onClick = {
+                if (isInCart) {
+                    onRemoveFromCart(book)
+                } else {
+                    onAddToCart(book)
                 }
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            buttonColor,
-                            buttonColor.copy(alpha = 0.8f)
-                        )
-                    )
-                ),
-            color = Color.Transparent,
-            shadowElevation = 8.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = buttonIcon,
-                    contentDescription = buttonText,
-                    modifier = Modifier.size(24.dp),
-                    tint = Color.White
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Text(
-                    text = buttonText,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = Color.White
-                )
-            }
-        }
+            },
+            icon = buttonIcon,
+            style = if (isInCart) ButtonStyle.Secondary else ButtonStyle.Primary,
+            size = ButtonSize.Large,
+            modifier = modifier
+                .fillMaxWidth(0.8f)
+        )
     }
 }
 

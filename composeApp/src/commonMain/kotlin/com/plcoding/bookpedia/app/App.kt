@@ -1,5 +1,9 @@
 package com.plcoding.bookpedia.app
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -7,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.plcoding.bookpedia.core.presentation.theme.BookPediaTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,6 +36,7 @@ import com.plcoding.bookpedia.book.presentation.book_detail.BookDetailScreenRoot
 import com.plcoding.bookpedia.book.presentation.book_detail.BookDetailViewModel
 import com.plcoding.bookpedia.book.presentation.book_list.BookListScreenRoot
 import com.plcoding.bookpedia.book.presentation.book_list.BookListViewModel
+import com.plcoding.bookpedia.book.presentation.splash_screen.SplashScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -45,18 +51,36 @@ import org.koin.core.parameter.parametersOf
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    BookPediaTheme {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
             startDestination = Route.BookGraph
         ) {
             navigation<Route.BookGraph>(
-                startDestination = Route.BookList
+                startDestination = Route.SplashScreen
             ) {
+
+                composable<Route.SplashScreen> {
+                    val gotoBookList = {navController.navigate(Route.BookList){
+                        popUpTo(Route.SplashScreen){inclusive = true}
+                    } }
+                    SplashScreen(gotoBookList)
+                }
+
                 composable<Route.BookList>(
-                    exitTransition = { slideOutHorizontally() },
-                    popEnterTransition = { slideInHorizontally() }
+                    exitTransition = { 
+                        slideOutHorizontally(
+                            targetOffsetX = { -it / 3 },
+                            animationSpec = tween(500)
+                        ) + fadeOut(animationSpec = tween(300))
+                    },
+                    popEnterTransition = { 
+                        slideInHorizontally(
+                            initialOffsetX = { -it / 3 },
+                            animationSpec = tween(500)
+                        ) + fadeIn(animationSpec = tween(300))
+                    }
                 ) {
                     val viewModel = koinViewModel<BookListViewModel>()
                     val selectedBookViewModel =
@@ -82,12 +106,30 @@ fun App() {
                     )
                 }
                 composable<Route.BookDetail>(
-                    enterTransition = { slideInHorizontally { initialOffset ->
-                        initialOffset
-                    } },
-                    exitTransition = { slideOutHorizontally { initialOffset ->
-                        initialOffset
-                    } }
+                    enterTransition = { 
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(500, easing = FastOutSlowInEasing)
+                        ) + fadeIn(animationSpec = tween(300))
+                    },
+                    exitTransition = { 
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(500, easing = FastOutSlowInEasing)
+                        ) + fadeOut(animationSpec = tween(300))
+                    },
+                    popEnterTransition = {
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(500, easing = FastOutSlowInEasing)
+                        ) + fadeIn(animationSpec = tween(300))
+                    },
+                    popExitTransition = {
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(500, easing = FastOutSlowInEasing)
+                        ) + fadeOut(animationSpec = tween(300))
+                    }
                 ) {
                     val selectedBookViewModel =
                         it.sharedKoinViewModel<SelectedBookViewModel>(navController)    // This is
@@ -113,12 +155,30 @@ fun App() {
                 }
 
                 composable<Route.AddToCart>(
-                    enterTransition = { slideInHorizontally { initialOffset ->
-                        initialOffset
-                    } },
-                    exitTransition = { slideOutHorizontally { initialOffset ->
-                        initialOffset
-                    } }
+                    enterTransition = { 
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing)
+                        ) + fadeIn(animationSpec = tween(200))
+                    },
+                    exitTransition = { 
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing)
+                        ) + fadeOut(animationSpec = tween(200))
+                    },
+                    popEnterTransition = {
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing)
+                        ) + fadeIn(animationSpec = tween(200))
+                    },
+                    popExitTransition = {
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing)
+                        ) + fadeOut(animationSpec = tween(200))
+                    }
                 ) {
                     val viewModel = koinViewModel<AddToCartViewModel>()
                     val selectedBookViewModel =
@@ -137,12 +197,18 @@ fun App() {
                 }
 
                 composable<Route.CheckoutScreen>(
-                    enterTransition = { slideInHorizontally { initialOffset ->
-                        initialOffset
-                    } },
-                    exitTransition = { slideOutHorizontally { initialOffset ->
-                        initialOffset
-                    } }
+                    enterTransition = { 
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing)
+                        ) + fadeIn(animationSpec = tween(200))
+                    },
+                    exitTransition = { 
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing)
+                        ) + fadeOut(animationSpec = tween(200))
+                    }
                 ) {
                     CheckoutScreen(
                         selectedBookViewModel = it.sharedKoinViewModel<SelectedBookViewModel>(navController)

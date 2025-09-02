@@ -8,6 +8,9 @@ sealed interface Route {
     data object BookGraph: Route
 
     @Serializable
+    data object SplashScreen: Route
+
+    @Serializable
     data object BookList: Route
 
     @Serializable
