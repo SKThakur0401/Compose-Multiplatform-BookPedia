@@ -181,14 +181,6 @@ private fun HeroSection(
             )
             
             Spacer(modifier = Modifier.height(4.dp))
-            
-            if (!showSearch) {
-                Text(
-                    text = "Discover Your Next Great Read",
-                    style = BookPediaCustomTypography.SplashSubtitle.copy(fontSize = 14.sp),
-                    color = BookPediaColors.SecondaryDark.copy(alpha = 0.8f)
-                )
-            }
         }
         
         Spacer(modifier = Modifier.height(20.dp))
@@ -203,7 +195,7 @@ private fun HeroSection(
                     query = searchQuery,
                     onQueryChange = onSearchQueryChange,
                     onSearch = { onSearchSubmit() },
-                    placeholder = "Search for books, authors, genres...",
+                    placeholder = "Find your book...",
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {

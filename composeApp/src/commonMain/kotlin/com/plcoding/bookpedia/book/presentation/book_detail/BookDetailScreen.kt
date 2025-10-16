@@ -929,7 +929,7 @@ private fun SynopsisSectionStunning(description: String) {
                     lineHeight = 24.sp
                 ),
                 textAlign = TextAlign.Justify,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
             )
 
             if (canBeTruncated) {

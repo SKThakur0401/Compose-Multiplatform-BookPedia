@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.plcoding.bookpedia.book.domain.Book
 import com.plcoding.bookpedia.book.presentation.SelectedBookViewModel
+import com.plcoding.bookpedia.book.presentation.add_to_cart.components.EnhancedCartItemCard
 import com.plcoding.bookpedia.core.presentation.components.*
 import com.plcoding.bookpedia.core.presentation.theme.*
 import kotlinx.coroutines.GlobalScope
@@ -190,117 +191,7 @@ private fun PremiumTopAppBar(
     }
 }
 
-@Composable
-private fun EnhancedCartItemCard(
-    book: Book,
-    onRemoveClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var isRemoving by remember { mutableStateOf(false) }
-    
-    AnimatedVisibility(
-        visible = !isRemoving,
-        exit = slideOutHorizontally(
-            targetOffsetX = { -it },
-            animationSpec = BookPediaAnimations.emphasizedTweenIntOffset
-        ) + fadeOut(animationSpec = BookPediaAnimations.smoothTween),
-        modifier = modifier
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            shape = BookPediaCustomShapes.BookCard,
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 6.dp,
-                pressedElevation = 8.dp
-            )
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Enhanced Book Cover
-                Card(
-                    modifier = Modifier.size(width = 60.dp, height = 90.dp),
-                    shape = BookPediaCustomShapes.BookCover,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    AsyncImage(
-                        model = book.imageUrl,
-                        contentDescription = book.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-                
-                // Book Details
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = book.title,
-                        style = BookPediaCustomTypography.BookTitle.copy(fontSize = 16.sp),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    if (book.authors.isNotEmpty()) {
-                        Text(
-                            text = "by ${book.authors.joinToString()}",
-                            style = BookPediaCustomTypography.AuthorName,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
-                    // Rating if available
-                    book.averageRating?.let { rating ->
-                        RatingBar(
-                            rating = rating,
-                            size = 12.dp,
-                            spacing = 1.dp,
-                            showRatingText = true,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                    
-                    // Price
-                    Text(
-                        text = "$${book.generateBookPrice()}",
-                        style = BookPediaCustomTypography.PriceText.copy(fontSize = 16.sp),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-                
-                // Remove Button
-                PremiumButton(
-                    text = "Remove",
-                    onClick = {
-                        isRemoving = true
-                        // Delay the actual removal to allow animation to play
-                        GlobalScope.launch {
-                            delay(300)
-                            onRemoveClick()
-                        }
-                    },
-                    style = ButtonStyle.Outlined,
-                    size = ButtonSize.Small,
-                    icon = Icons.Default.Delete,
-                    modifier = Modifier.wrapContentWidth()
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun PremiumCheckoutBar(

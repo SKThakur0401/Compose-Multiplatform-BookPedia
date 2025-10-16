@@ -210,8 +210,12 @@ fun App() {
                         ) + fadeOut(animationSpec = tween(200))
                     }
                 ) {
+
                     CheckoutScreen(
-                        selectedBookViewModel = it.sharedKoinViewModel<SelectedBookViewModel>(navController)
+                        selectedBookViewModel = it.sharedKoinViewModel<SelectedBookViewModel>(navController),
+                        goBackToBookList = {navController.navigate(Route.BookList){
+                            popUpTo(Route.BookList){inclusive = true}
+                        } }
                     )
                 }
             }

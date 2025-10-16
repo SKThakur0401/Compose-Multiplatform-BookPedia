@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.RemoveShoppingCart
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.materialIcon
@@ -23,7 +24,7 @@ object BookPediaIcons {
     val Favorite = Icons.Default.Favorite
     val FavoriteBorder = Icons.Default.FavoriteBorder
     val Add = Icons.Default.Add
-    val Remove = Icons.Default.Star
+    val Remove = Icons.Default.RemoveShoppingCart
     val Search = Icons.Default.Search
     val Close = Icons.Default.Close
     

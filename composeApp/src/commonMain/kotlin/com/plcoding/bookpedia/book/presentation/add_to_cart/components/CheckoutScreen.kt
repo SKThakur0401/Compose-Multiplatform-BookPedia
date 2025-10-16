@@ -5,7 +5,7 @@ import com.plcoding.bookpedia.book.presentation.SelectedBookViewModel
 import com.plcoding.bookpedia.book.presentation.add_to_cart.PremiumCheckoutScreen
 
 @Composable
-fun CheckoutScreen(selectedBookViewModel: SelectedBookViewModel) {
+fun CheckoutScreen(selectedBookViewModel: SelectedBookViewModel, goBackToBookList : () -> Unit) {
     // Use the new premium implementation
-    PremiumCheckoutScreen(selectedBookViewModel = selectedBookViewModel)
+    PremiumCheckoutScreen(selectedBookViewModel = selectedBookViewModel, onBackClick = goBackToBookList)
 }

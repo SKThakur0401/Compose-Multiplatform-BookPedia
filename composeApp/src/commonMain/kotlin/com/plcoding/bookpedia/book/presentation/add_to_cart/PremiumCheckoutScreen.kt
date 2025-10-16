@@ -1,36 +1,32 @@
 package com.plcoding.bookpedia.book.presentation.add_to_cart
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.plcoding.bookpedia.book.domain.Book
 import com.plcoding.bookpedia.book.presentation.SelectedBookViewModel
+import com.plcoding.bookpedia.book.presentation.add_to_cart.components.checkout_steps.OrderSummaryStep
+import com.plcoding.bookpedia.book.presentation.add_to_cart.components.checkout_steps.PaymentDetailsStep
+import com.plcoding.bookpedia.core.data.Utils
+import com.plcoding.bookpedia.core.data.Utils.formatPrice
 import com.plcoding.bookpedia.core.presentation.components.*
 import com.plcoding.bookpedia.core.presentation.theme.*
 import kotlinx.coroutines.delay
-import kotlin.math.round
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -122,8 +118,8 @@ fun PremiumCheckoutScreen(
                     )
                     CheckoutStep.Completed -> CompletedStep(
                         totalAmount = totalAmount,
-                        orderNumber = "Coding..", /*BP${System.currentTimeMillis().toString().takeLast(6)}*/
-                        onContinueShopping = { /* Navigate back to book list */ }
+                        orderNumber = "184928", /*BP${System.currentTimeMillis().toString().takeLast(6)}*/
+                        onContinueShopping = { onBackClick() }
                     )
                 }
             }
@@ -295,77 +291,9 @@ private fun CheckoutProgressIndicator(
     }
 }
 
-@Composable
-private fun OrderSummaryStep(
-    cartItems: List<Book>,
-    subtotal: Double,
-    gstAmount: Double,
-    shippingCost: Double,
-    totalAmount: Double,
-    onContinue: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        // Order Items
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            shape = BookPediaCustomShapes.BookCard
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Order Items (${cartItems.size})",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
-                cartItems.forEach { book ->
-                    OrderItemSummary(book = book)
-                    if (book != cartItems.last()) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
-                        )
-                    }
-                }
-            }
-        }
-        
-        // Price Breakdown
-        PriceBreakdownCard(
-            subtotal = subtotal,
-            gstAmount = gstAmount,
-            shippingCost = shippingCost,
-            totalAmount = totalAmount
-        )
-        
-        Spacer(modifier = Modifier.weight(1f))
-        
-        // Continue Button
-        PremiumButton(
-            text = "Continue to Payment",
-            onClick = onContinue,
-            style = ButtonStyle.Primary,
-            size = ButtonSize.Large,
-            icon = Icons.Default.ArrowForward,
-            iconPosition = IconPosition.Trailing,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
 
 @Composable
-private fun OrderItemSummary(book: Book) {
+fun OrderItemSummary(book: Book) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -420,7 +348,7 @@ private fun OrderItemSummary(book: Book) {
 }
 
 @Composable
-private fun PriceBreakdownCard(
+fun PriceBreakdownCard(
     subtotal: Double,
     gstAmount: Double,
     shippingCost: Double,
@@ -445,7 +373,7 @@ private fun PriceBreakdownCard(
             )
             
             PriceRow("Subtotal", subtotal)
-            PriceRow("GST (18%)", gstAmount)
+            PriceRow("Tax (18%)", gstAmount)
             PriceRow("Shipping", shippingCost, showFree = shippingCost == 0.0)
             
             HorizontalDivider(
@@ -467,7 +395,7 @@ private fun PriceBreakdownCard(
                 )
                 
                 Text(
-                    text = formatPrice(totalAmount),
+                    text = Utils.formatPrice(totalAmount),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -504,57 +432,6 @@ private fun PriceRow(
     }
 }
 
-@Composable
-private fun PaymentDetailsStep(
-    totalAmount: Double,
-    onContinue: () -> Unit,
-    onBack: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Text(
-            text = "Payment Details",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        
-        Text(
-            text = "This is a demo app. No actual payment will be processed.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        
-        Spacer(modifier = Modifier.weight(1f))
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            PremiumButton(
-                text = "Back",
-                onClick = onBack,
-                style = ButtonStyle.Outlined,
-                size = ButtonSize.Large,
-                modifier = Modifier.weight(1f)
-            )
-            
-            PremiumButton(
-                text = "Place Order",
-                onClick = onContinue,
-                style = ButtonStyle.Primary,
-                size = ButtonSize.Large,
-                modifier = Modifier.weight(2f)
-            )
-        }
-    }
-}
 
 @Composable
 private fun ProcessingStep(
@@ -671,9 +548,6 @@ private fun CompletedStep(
     }
 }
 
-private fun formatPrice(amount: Double): String {
-    return "$${amount}"
-}
 
 enum class CheckoutStep {
     OrderSummary,
